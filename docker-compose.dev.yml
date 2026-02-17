@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  llm-gateway:
+    command: python -m uvicorn src.main:app --host 0.0.0.0 --port 8001 --reload
+    environment:
+      - LOG_LEVEL=DEBUG
+
+  rag-service:
+    command: python -m uvicorn src.main:app --host 0.0.0.0 --port 8002 --reload
+    environment:
+      - LOG_LEVEL=DEBUG
+
+  agent-service:
+    command: python -m uvicorn src.main:app --host 0.0.0.0 --port 8003 --reload
+    environment:
+      - LOG_LEVEL=DEBUG
+
+  eval-harness:
+    command: python -m uvicorn src.main:app --host 0.0.0.0 --port 8004 --reload
+    environment:
+      - LOG_LEVEL=DEBUG
+
+  portal:
+    command: npm run dev
+    environment:
+      - NODE_ENV=development

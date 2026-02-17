@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  chroma:
+    image: chromadb/chroma:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma
+
+  llm-gateway:
+    build: ./apps/llm-gateway
+    ports:
+      - "8001:8001"
+    environment:
+      - PORT=8001
+      - LOG_LEVEL=INFO
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - RATE_LIMIT_PER_MINUTE=100
+    depends_on:
+      - chroma
+    volumes:
+      - ./apps/llm-gateway:/app
+      - ./packages/python-common:/packages/python-common
+
+  rag-service:
+    build: ./apps/rag-service
+    ports:
+      - "8002:8002"
+    environment:
+      - PORT=8002
+      - LOG_LEVEL=INFO
+      - CHROMA_HOST=chroma
+      - CHROMA_PORT=8000
+      - VECTOR_STORE_TYPE=chroma
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - RATE_LIMIT_PER_MINUTE=100
+    depends_on:
+      - chroma
+    volumes:
+      - ./apps/rag-service:/app
+      - ./packages/python-common:/packages/python-common
+      - ./packages/vector-store:/packages/vector-store
+
+  agent-service:
+    build: ./apps/agent-service
+    ports:
+      - "8003:8003"
+    environment:
+      - PORT=8003
+      - LOG_LEVEL=INFO
+      - LLM_GATEWAY_URL=http://llm-gateway:8001
+      - RAG_SERVICE_URL=http://rag-service:8002
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - RATE_LIMIT_PER_MINUTE=100
+    depends_on:
+      - llm-gateway
+      - rag-service
+    volumes:
+      - ./apps/agent-service:/app
+      - ./packages/python-common:/packages/python-common
+
+  eval-harness:
+    build: ./apps/eval-harness
+    ports:
+      - "8004:8004"
+    environment:
+      - PORT=8004
+      - LOG_LEVEL=INFO
+      - LLM_GATEWAY_URL=http://llm-gateway:8001
+      - RAG_SERVICE_URL=http://rag-service:8002
+      - AGENT_SERVICE_URL=http://agent-service:8003
+    depends_on:
+      - llm-gateway
+      - rag-service
+      - agent-service
+    volumes:
+      - ./apps/eval-harness:/app
+      - ./packages/python-common:/packages/python-common
+
+  portal:
+    build: ./apps/portal
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_LLM_GATEWAY_URL=http://localhost:8001
+      - NEXT_PUBLIC_RAG_SERVICE_URL=http://localhost:8002
+      - NEXT_PUBLIC_AGENT_SERVICE_URL=http://localhost:8003
+      - NEXT_PUBLIC_EVAL_SERVICE_URL=http://localhost:8004
+      - NEXT_PUBLIC_GITHUB_REPO=${GITHUB_REPO:-github.com/org/prismflow}
+    depends_on:
+      - llm-gateway
+      - rag-service
+      - agent-service
+      - eval-harness
+    volumes:
+      - ./apps/portal:/app
+      - /app/node_modules
+      - /app/.next
+
+volumes:
+  chroma_data:
