@@ -35,7 +35,7 @@ router = APIRouter()
 async def chat(request):  # TODO: type with Pydantic model (message, user_id, session_id, strict_json, json_schema)
     """Chat completion: one user message → one LLM answer. Citations empty in Week 1."""
 
-    request_id = get_request_id()
+    request_id = get_request_id()  # pyright: ignore[reportUnusedVariable]
     # 2. Validate/sanitize input so invalid or malicious input doesn’t reach the LLM.
     #    Tip: python_common.security.sanitize_input, detect_injection
     #    On failure: return 400 with typed error body (Pydantic model), not raw exception.
