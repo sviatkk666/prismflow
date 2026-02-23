@@ -239,3 +239,4 @@ See `apps/portal/components/README.md` for full documentation.
 - Component Library: `apps/portal/components/README.md`
 - Blueprint: `BLUEPRINT.md`
 - Main README: `README.md`
+- **Production AI Engineering**: `PRODUCTION_AI_ENGINEERING.md` — checklist to cover all production work cases for a strong AI Applied Engineer (security, observability, reliability, testing, infra, etc.)

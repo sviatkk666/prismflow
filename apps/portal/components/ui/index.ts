@@ -5,6 +5,7 @@ export { CodeViewer } from './CodeViewer';
 export { AnimatedCounter } from './AnimatedCounter';
 export { LoadingSpinner } from './LoadingSpinner';
 export { Toast, ToastContainer, type ToastType } from './Toast';
+export { ToastRoot } from './ToastRoot';
 export { Badge } from './Badge';
 export { Skeleton } from './Skeleton';
 export { Tooltip } from './Tooltip';

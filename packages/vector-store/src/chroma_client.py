@@ -62,6 +62,7 @@ class ChromaVectorStore(VectorStore):
     def delete_collection(self, collection_name: str) -> bool:
         """Delete a collection"""
         try:
+            
             self.client.delete_collection(name=collection_name)
             return True
         except Exception:

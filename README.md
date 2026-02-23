@@ -43,6 +43,28 @@ make dev
 
 6. Access the portal at `http://localhost:3000`
 
+### Local development (no Docker)
+
+Run the portal and LLM gateway in **two separate terminals**:
+
+**Terminal 1 – Portal**
+```bash
+cd apps/portal
+npm install
+npm run dev
+```
+Then open **http://localhost:3000** (or **http://127.0.0.1:3000**).
+
+**Terminal 2 – LLM Gateway**
+```bash
+cd apps/llm-gateway
+pip install -e .
+python -m uvicorn src.main:app --reload --port 8001
+```
+API: **http://localhost:8001** · Docs: **http://localhost:8001/docs**
+
+If **localhost is not reachable**, try **127.0.0.1** instead (e.g. http://127.0.0.1:3000). Ensure no other app is using ports 3000 or 8001, and that your firewall allows local connections.
+
 ## 📖 Architecture
 
 PrismFlow is organized as a monorepo with the following structure:
