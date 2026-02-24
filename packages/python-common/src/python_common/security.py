@@ -79,19 +79,6 @@ def validate_output(text: str, schema: Optional[dict] = None) -> Tuple[bool, str
             if not isinstance(data[k], v):
                 return False, text
         return True, text
-    """Validate output as JSON; optionally check schema. Returns (valid, text)."""
-    if schema is None:
-        return True, text
-    try:
-        json.loads(text)
-        return True, text
-    except json.JSONDecodeError:
-        repaired = repair_json(text)
-        try:
-            json.loads(repaired)
-            return True, repaired
-        except json.JSONDecodeError:
-            return False, text
 
 
 def repair_json(text: str) -> str:
